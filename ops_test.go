@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"regexp"
 
-	"github.com/QubitProducts/jsonlogic"
+	"github.com/tcolgate/jsonlogic"
 )
 
 func init() {
