@@ -116,11 +116,9 @@ func IsEqual(l, r interface{}) bool {
 		rptr := reflect.ValueOf(rmap)
 		return lptr == rptr
 	case lisslice && risslice:
-		lhdr := (*reflect.SliceHeader)(unsafe.Pointer(&lslice))
-		rhdr := (*reflect.SliceHeader)(unsafe.Pointer(&rslice))
-		return lhdr.Cap == rhdr.Cap &&
-			lhdr.Len == rhdr.Len &&
-			lhdr.Data == rhdr.Data
+		return cap(lslice) == cap(rslice) &&
+			len(lslice) == len(rslice) &&
+			unsafe.SliceData(lslice) == unsafe.SliceData(rslice)
 	case
 		lisbool && risbool,
 		lisfloat && risfloat,
@@ -157,11 +155,9 @@ func IsSoftEqual(l, r interface{}) bool {
 		rptr := reflect.ValueOf(rmap)
 		return lptr == rptr
 	case lisslice && risslice:
-		lhdr := (*reflect.SliceHeader)(unsafe.Pointer(&lslice))
-		rhdr := (*reflect.SliceHeader)(unsafe.Pointer(&rslice))
-		return lhdr.Cap == rhdr.Cap &&
-			lhdr.Len == rhdr.Len &&
-			lhdr.Data == rhdr.Data
+		return cap(lslice) == cap(rslice) &&
+			len(lslice) == len(rslice) &&
+			unsafe.SliceData(lslice) == unsafe.SliceData(rslice)
 	case lisslice || risslice:
 		if lisslice {
 			return IsSoftEqual(toString(l), r)
