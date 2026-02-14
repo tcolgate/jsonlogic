@@ -14,7 +14,7 @@ type Operator struct {
 // operator.
 type Argument struct {
 	Clause *Clause
-	Value  interface{}
+	Value  any
 }
 
 // MarshalJSON implements json.Marshaler. It enforces
@@ -44,7 +44,7 @@ func (a *Argument) UnmarshalJSON(bs []byte) error {
 		return nil
 	}
 
-	var v interface{}
+	var v any
 	vErr := json.Unmarshal(bs, &v)
 	if vErr == nil {
 		*a = Argument{
@@ -79,14 +79,14 @@ func (args *Arguments) UnmarshalJSON(bs []byte) error {
 // sliceHasPossibleClause recursivelychecks slices to see if they contain a dictionary
 // that could be a clause.  This lets us treat slices as clauses only in the cases
 // where we have to
-func sliceHasPossibleClause(ifs []interface{}) bool {
+func sliceHasPossibleClause(ifs []any) bool {
 	for i := range ifs {
 		switch v := ifs[i].(type) {
-		case []interface{}:
+		case []any:
 			if sliceHasPossibleClause(v) {
 				return true
 			}
-		case map[string]interface{}:
+		case map[string]any:
 			if len(v) == 1 {
 				return true
 			}
@@ -119,16 +119,16 @@ func (c *Clause) UnmarshalJSON(bs []byte) error {
 		}
 	}
 
-	var raw interface{}
+	var raw any
 	err = json.Unmarshal(bs, &raw)
 	if err != nil {
 		return err
 	}
-	if rawslice, ok := raw.([]interface{}); ok {
+	if rawslice, ok := raw.([]any); ok {
 		// this is a bit subtle, we want to differentiate instances of the empty
 		// slice, this forces a new slice header.
 		if len(rawslice) == 0 {
-			raw = make([]interface{}, 0, 1)
+			raw = make([]any, 0, 1)
 		}
 
 		if sliceHasPossibleClause(rawslice) {

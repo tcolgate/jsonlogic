@@ -36,7 +36,7 @@ func ExampleOpsSet() {
 		// We want two args, 1 for the data we are going to match, and one
 		// for the regex itself.
 		if len(args) < 2 {
-			return func(ctx context.Context, data interface{}) interface{} {
+			return func(ctx context.Context, data any) any {
 				return false
 			}, nil
 		}
@@ -56,7 +56,7 @@ func ExampleOpsSet() {
 			return nil, err
 		}
 
-		return func(ctx context.Context, data interface{}) interface{} {
+		return func(ctx context.Context, data any) any {
 			// We evaluate the first argument, using
 			// the data the user provided.
 			lval := lArg(ctx, data)
@@ -99,7 +99,7 @@ func ExampleOpsSet() {
 
 	cf, _ := ops.Compile(&cls)
 
-	var tests = []interface{}{
+	var tests = []any{
 		`this matches`,
 		`that doesn't`,
 		float64(1),

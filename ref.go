@@ -5,12 +5,12 @@ import (
 	"strings"
 )
 
-func deref(data interface{}, ref []string) interface{} {
+func deref(data any, ref []string) any {
 	if len(ref) == 0 {
 		return nil
 	}
 	switch data := data.(type) {
-	case []interface{}:
+	case []any:
 		index, err := strconv.Atoi(ref[0])
 		if err != nil || index < 0 || index+1 > len(data) {
 			return nil
@@ -20,7 +20,7 @@ func deref(data interface{}, ref []string) interface{} {
 			return val
 		}
 		return deref(val, ref[1:])
-	case map[string]interface{}:
+	case map[string]any:
 		val, ok := data[ref[0]]
 		if !ok {
 			return nil
@@ -35,7 +35,7 @@ func deref(data interface{}, ref []string) interface{} {
 
 // DottedRef attempts to resolve a dotted reference into a
 // Go type. Only map[string]interface{} is supported for now.
-func DottedRef(data interface{}, ref interface{}) interface{} {
+func DottedRef(data any, ref any) any {
 	var refStr string
 	switch ref := ref.(type) {
 	case string:

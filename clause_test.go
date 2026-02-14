@@ -26,7 +26,7 @@ func Example() {
 								{ "var": "i" }
 							 ]}`
 
-	data := map[string]interface{}{"i": float64(20)}
+	data := map[string]any{"i": float64(20)}
 
 	var c Clause
 	err := json.Unmarshal([]byte(fizzbuzz), &c)
@@ -136,8 +136,8 @@ func TestClauseEval(t *testing.T) {
 	type test struct {
 		name       string
 		rule       string
-		data       interface{}
-		expect     interface{}
+		data       any
+		expect     any
 		compileErr string
 	}
 
@@ -150,15 +150,15 @@ func TestClauseEval(t *testing.T) {
 		{
 			name: "invalid-clause2",
 			rule: `{"var":["a"],"hola":"thing"}`,
-			expect: map[string]interface{}{
+			expect: map[string]any{
 				"hola": "thing",
-				"var":  []interface{}{"a"},
+				"var":  []any{"a"},
 			},
 		},
 		{
 			name:   "var-lookup-not-found-with-data",
 			rule:   `{"var":"d"}`,
-			data:   map[string]interface{}{"a": 1},
+			data:   map[string]any{"a": 1},
 			expect: nil,
 		},
 		{
@@ -242,25 +242,25 @@ func TestClauseEval(t *testing.T) {
 		{
 			name:   "equal-coerced-sliceref",
 			rule:   `{"==":[{"var":"a"},{"var":"a"}]}`,
-			data:   map[string]interface{}{"a": []interface{}{}},
+			data:   map[string]any{"a": []any{}},
 			expect: true,
 		},
 		{
 			name:   "equal-coerced-sliceref",
 			rule:   `{"==":[{"var":"a"},{"var":"b"}]}`,
-			data:   map[string]interface{}{"a": make([]interface{}, 0, 1), "b": make([]interface{}, 0, 1)},
+			data:   map[string]any{"a": make([]any, 0, 1), "b": make([]any, 0, 1)},
 			expect: false,
 		},
 		{
 			name:   "equal-coerced-mapref",
 			rule:   `{"==":[{"var":"a"},{"var":"a"}]}`,
-			data:   map[string]interface{}{"a": map[string]interface{}{}, "b": map[string]interface{}{}},
+			data:   map[string]any{"a": map[string]any{}, "b": map[string]any{}},
 			expect: true,
 		},
 		{
 			name:   "equal-coerced-mapref",
 			rule:   `{"==":[{"var":"a"},{"var":"b"}]}`,
-			data:   map[string]interface{}{"a": map[string]interface{}{}, "b": map[string]interface{}{}},
+			data:   map[string]any{"a": map[string]any{}, "b": map[string]any{}},
 			expect: false,
 		},
 		{
@@ -361,7 +361,7 @@ func TestClauseEval(t *testing.T) {
 		{
 			name:   "or-multi-last-false",
 			rule:   `{"or": [ false,0,[] ] }`,
-			expect: []interface{}{},
+			expect: []any{},
 		},
 		{
 			name:   "and",
@@ -456,13 +456,13 @@ func TestClauseEval(t *testing.T) {
 		{
 			name:   "less-with-data",
 			rule:   `{ "<": [0, {"var":"temp"}, 100]}`,
-			data:   map[string]interface{}{"temp": 37.0},
+			data:   map[string]any{"temp": 37.0},
 			expect: true,
 		},
 		{
 			name:   "less-with-data-",
 			rule:   `{ "<": [0, {"var":"thing.temp"}, 100]}`,
-			data:   map[string]interface{}{"thing": map[string]interface{}{"temp": 37.0}},
+			data:   map[string]any{"thing": map[string]any{"temp": 37.0}},
 			expect: true,
 		},
 		{
@@ -571,32 +571,32 @@ func TestClauseEval(t *testing.T) {
 		{
 			name:   "data-driven",
 			rule:   `{ "var" : ["a"] }`,
-			data:   map[string]interface{}{"a": float64(1)},
+			data:   map[string]any{"a": float64(1)},
 			expect: float64(1),
 		},
 		{
 			name:   "data-driven-strings",
 			rule:   `{ "var" : ["a"] }`,
-			data:   map[string]interface{}{"a": []string{"a", "b", "c"}},
+			data:   map[string]any{"a": []string{"a", "b", "c"}},
 			expect: []string{"a", "b", "c"},
 		},
 		{
 			name:   "data-driven-default",
 			rule:   `{ "var" : ["b",26] }`,
-			data:   map[string]interface{}{"a": float64(1)},
+			data:   map[string]any{"a": float64(1)},
 			expect: float64(26),
 		},
 		{
 			name:   "data-driven-sugar",
 			rule:   `{ "var" : "a" }`,
-			data:   map[string]interface{}{"a": float64(1)},
+			data:   map[string]any{"a": float64(1)},
 			expect: float64(1),
 		},
 		{
 			name:   "data-driven-empty-key",
 			rule:   `{ "var" : "" }`,
-			data:   map[string]interface{}{"a": float64(1)},
-			expect: map[string]interface{}{"a": float64(1)},
+			data:   map[string]any{"a": float64(1)},
+			expect: map[string]any{"a": float64(1)},
 		},
 		{
 			name:   "data-driven-empty-array-key",
@@ -607,19 +607,19 @@ func TestClauseEval(t *testing.T) {
 		{
 			name:   "data-driven-array",
 			rule:   `{ "var" : 1 }`,
-			data:   []interface{}{"apple", "banana", "carrot"},
+			data:   []any{"apple", "banana", "carrot"},
 			expect: "banana",
 		},
 		{
 			name:   "data-driven-array-deep",
 			rule:   `{ "var" : ["0.2"] }`,
-			data:   []interface{}{[]interface{}{"apple", "banana", "carrot"}},
+			data:   []any{[]any{"apple", "banana", "carrot"}},
 			expect: "carrot",
 		},
 		{
 			name:   "data-driven-array-deep-string",
 			rule:   `{ "var" : ["0.2"] }`,
-			data:   []interface{}{[]interface{}{"apple", "banana", "carrot"}},
+			data:   []any{[]any{"apple", "banana", "carrot"}},
 			expect: "carrot",
 		},
 		{
@@ -628,9 +628,9 @@ func TestClauseEval(t *testing.T) {
 									{"<" : [ { "var" : "temp" }, 110 ]},
 									{"==" : [ { "var" : "pie.filling" }, "apple" ] }
 								] }`,
-			data: map[string]interface{}{
+			data: map[string]any{
 				"temp": 100.0,
-				"pie":  map[string]interface{}{"filling": "apple"},
+				"pie":  map[string]any{"filling": "apple"},
 			},
 			expect: true,
 		},
@@ -649,19 +649,19 @@ func TestClauseEval(t *testing.T) {
 								{ "var": "i" }
 							 ]}`,
 			expect: "buzz",
-			data:   map[string]interface{}{"i": float64(20)},
+			data:   map[string]any{"i": float64(20)},
 		},
 		{
 			name:   "missing",
 			rule:   `{"missing":["a", "b"]}`,
-			data:   map[string]interface{}{"a": "apple", "c": "carrot"},
-			expect: []interface{}{"b"},
+			data:   map[string]any{"a": "apple", "c": "carrot"},
+			expect: []any{"b"},
 		},
 		{
 			name:   "missing-none-missing",
 			rule:   `{"missing":["a", "b"]}`,
-			data:   map[string]interface{}{"a": "apple", "b": "carrot"},
-			expect: []interface{}{},
+			data:   map[string]any{"a": "apple", "b": "carrot"},
+			expect: []any{},
 		},
 		{
 			name: "missing-with-if",
@@ -670,20 +670,20 @@ func TestClauseEval(t *testing.T) {
 							"Not enough fruit",
 							"OK to proceed"
 						 ]}`,
-			data:   map[string]interface{}{"a": "apple", "b": "carrot"},
+			data:   map[string]any{"a": "apple", "b": "carrot"},
 			expect: "OK to proceed",
 		},
 		{
 			name:   "missing_some-ok",
 			rule:   `{"missing_some":[1, ["a", "b", "c"]]}`,
-			data:   map[string]interface{}{"a": "apple"},
-			expect: []interface{}{},
+			data:   map[string]any{"a": "apple"},
+			expect: []any{},
 		},
 		{
 			name:   "missing_some-toomany",
 			rule:   `{"missing_some":[2, ["a", "b", "c"]]}`,
-			data:   map[string]interface{}{"a": "apple"},
-			expect: []interface{}{"b", "c"},
+			data:   map[string]any{"a": "apple"},
+			expect: []any{"b", "c"},
 		},
 		{
 			name: "missing_some-complex",
@@ -695,7 +695,7 @@ func TestClauseEval(t *testing.T) {
 							"We require first name, last name, and one phone number.",
 							"OK to proceed"
 						 ]}`,
-			data:   map[string]interface{}{"first_name": "Bruce", "last_name": "Wayne"},
+			data:   map[string]any{"first_name": "Bruce", "last_name": "Wayne"},
 			expect: "We require first name, last name, and one phone number.",
 		},
 		{
@@ -717,7 +717,7 @@ func TestClauseEval(t *testing.T) {
 							{"<": [{"var":"temp"}, 100] }, "liquid",
 							"gas"
 						]}`,
-			data:   map[string]interface{}{"temp": 55.0},
+			data:   map[string]any{"temp": 55.0},
 			expect: "liquid",
 		},
 		{
@@ -726,10 +726,10 @@ func TestClauseEval(t *testing.T) {
 							{"var":"integers"},
 							{"*":[{"var":""},2]}
 						 ]}`,
-			data: map[string]interface{}{
-				"integers": []interface{}{1.0, 2.0, 3.0, 4.0, 5.0},
+			data: map[string]any{
+				"integers": []any{1.0, 2.0, 3.0, 4.0, 5.0},
 			},
-			expect: []interface{}{2.0, 4.0, 6.0, 8.0, 10.0},
+			expect: []any{2.0, 4.0, 6.0, 8.0, 10.0},
 		},
 		{
 			name: "filter",
@@ -737,10 +737,10 @@ func TestClauseEval(t *testing.T) {
 							{"var":"integers"},
 							{"%":[{"var":""},2]}
 						 ]}`,
-			data: map[string]interface{}{
-				"integers": []interface{}{1.0, 2.0, 3.0, 4.0, 5.0},
+			data: map[string]any{
+				"integers": []any{1.0, 2.0, 3.0, 4.0, 5.0},
 			},
-			expect: []interface{}{1.0, 3.0, 5.0},
+			expect: []any{1.0, 3.0, 5.0},
 		},
 		{
 			name: "reduce",
@@ -749,8 +749,8 @@ func TestClauseEval(t *testing.T) {
 					    {"+":[{"var":"current"}, {"var":"accumulator"}]},
 							0
 						 ]}`,
-			data: map[string]interface{}{
-				"integers": []interface{}{1.0, 2.0, 3.0, 4.0, 5.0},
+			data: map[string]any{
+				"integers": []any{1.0, 2.0, 3.0, 4.0, 5.0},
 			},
 			expect: 15.0,
 		},
@@ -802,17 +802,17 @@ func TestClauseEval(t *testing.T) {
 		{
 			name: "some-pies",
 			rule: `{"some" : [ {"var":"pies"}, {"==":[{"var":"filling"}, "apple"]} ]}`,
-			data: map[string]interface{}{
-				"pies": []interface{}{
-					map[string]interface{}{
+			data: map[string]any{
+				"pies": []any{
+					map[string]any{
 						"filling": "pumpkin",
 						"temp":    110.0,
 					},
-					map[string]interface{}{
+					map[string]any{
 						"filling": "rhubarb",
 						"temp":    210.0,
 					},
-					map[string]interface{}{
+					map[string]any{
 						"filling": "apple",
 						"temp":    310.0,
 					},
@@ -828,8 +828,8 @@ func TestClauseEval(t *testing.T) {
 		{
 			name: "some-in-ref",
 			rule: `{"some" : [ {"var":"items"}, {"in":[{"var":""}, ["a"]]} ]}`,
-			data: map[string]interface{}{
-				"items": []interface{}{"a", "b", "c"},
+			data: map[string]any{
+				"items": []any{"a", "b", "c"},
 			},
 			expect: true,
 		},
@@ -837,25 +837,25 @@ func TestClauseEval(t *testing.T) {
 			name:   "merge-empty",
 			rule:   `{"merge" : [ ]}`,
 			data:   nil,
-			expect: []interface{}{},
+			expect: []any{},
 		},
 		{
 			name:   "merge-regulat",
 			rule:   `{"merge":[ [1, 2], [3,4]]}`,
 			data:   nil,
-			expect: []interface{}{1.0, 2.0, 3.0, 4.0},
+			expect: []any{1.0, 2.0, 3.0, 4.0},
 		},
 		{
 			name:   "merge-coerce",
 			rule:   `{"merge":[ 1, 2, [3,4]]}`,
 			data:   nil,
-			expect: []interface{}{1.0, 2.0, 3.0, 4.0},
+			expect: []any{1.0, 2.0, 3.0, 4.0},
 		},
 		{
 			name:   "merge-coerce",
 			rule:   `{"merge":[ 1, 2, [3,[4,5]]]}`,
 			data:   nil,
-			expect: []interface{}{1.0, 2.0, 3.0, []interface{}{4.0, 5.0}},
+			expect: []any{1.0, 2.0, 3.0, []any{4.0, 5.0}},
 		},
 		{
 			name:   "in-array",
@@ -866,7 +866,7 @@ func TestClauseEval(t *testing.T) {
 		{
 			name:   "in-map",
 			rule:   `{"in": ["somekey", {"var": "a"}]}`,
-			data:   map[string]interface{}{"a": map[string]interface{}{"somekey": 1}},
+			data:   map[string]any{"a": map[string]any{"somekey": 1}},
 			expect: true,
 		},
 		{
@@ -950,9 +950,9 @@ func TestClauseEval(t *testing.T) {
 		{
 			name: "recs",
 			rule: `{"and": [{"some": [{"var": "rec.categories"}, {"in": [{ "var": "" }, ["Dresses"]]}]}]}`,
-			data: map[string]interface{}{
-				"rec": map[string]interface{}{
-					"categories": []interface{}{"New", "Dresses", "Clothing"},
+			data: map[string]any{
+				"rec": map[string]any{
+					"categories": []any{"New", "Dresses", "Clothing"},
 				},
 			},
 			expect: true,
@@ -964,7 +964,7 @@ func TestClauseEval(t *testing.T) {
 									{"===": [{"var": "rec.currency"}, "USD"]}
 							]}`,
 			expect: true,
-			data:   map[string]interface{}{"rec": map[string]interface{}{"price": 25.0, "currency": "USD"}},
+			data:   map[string]any{"rec": map[string]any{"price": 25.0, "currency": "USD"}},
 		},
 		{
 			name: "agh2",
@@ -972,7 +972,7 @@ func TestClauseEval(t *testing.T) {
 									{"===": [{"var": "rec.currency"}, "USD"]}
 							]}`,
 			expect: true,
-			data:   map[string]interface{}{"rec": map[string]interface{}{"price": 25.0, "currency": "USD"}},
+			data:   map[string]any{"rec": map[string]any{"price": 25.0, "currency": "USD"}},
 		},
 		{
 			name: "agh3",
@@ -980,35 +980,35 @@ func TestClauseEval(t *testing.T) {
 									{"<": [20, {"var": "rec.price"}, 30]}
 							]}`,
 			expect: true,
-			data:   map[string]interface{}{"rec": map[string]interface{}{"price": 25.0, "currency": "USD"}},
+			data:   map[string]any{"rec": map[string]any{"price": 25.0, "currency": "USD"}},
 		},
 		{
 			name:   "agh4",
 			rule:   `{"<": [20, {"var": "rec.price"}, 30]}`,
 			expect: true,
-			data:   map[string]interface{}{"rec": map[string]interface{}{"price": 25.0, "currency": "USD"}},
+			data:   map[string]any{"rec": map[string]any{"price": 25.0, "currency": "USD"}},
 		},
 		{
 			name:   "agh4",
 			rule:   `{"<": [20, {"var": "rec.price"}, 30]}`,
 			expect: true,
-			data:   map[string]interface{}{"rec": map[string]interface{}{"price": 25.0, "currency": "USD"}},
+			data:   map[string]any{"rec": map[string]any{"price": 25.0, "currency": "USD"}},
 		},
 		{
 			name:   "agh5",
 			rule:   `{"some": [{"merge":[{"var":"rec.name"}]}, {"===":[{"var": ""},"hello"]}]}`,
 			expect: true,
-			data:   map[string]interface{}{"rec": map[string]interface{}{"name": "hello"}},
+			data:   map[string]any{"rec": map[string]any{"name": "hello"}},
 		},
 		{
 			name:   "issue#1",
 			rule:   `{"reduce": [ [ {"var":"desserts.apple"}, {"var":"desserts.brownie"}, {"var":"desserts.cupcake"} ], {"+":[ {"var":"accumulator"}, {"var":"current.qty"}]}, 0 ]}`,
 			expect: float64(6),
-			data: map[string]interface{}{
-				"desserts": map[string]interface{}{
-					"apple":   map[string]interface{}{"qty": float64(1)},
-					"brownie": map[string]interface{}{"qty": float64(2)},
-					"cupcake": map[string]interface{}{"qty": float64(3)},
+			data: map[string]any{
+				"desserts": map[string]any{
+					"apple":   map[string]any{"qty": float64(1)},
+					"brownie": map[string]any{"qty": float64(2)},
+					"cupcake": map[string]any{"qty": float64(3)},
 				},
 			},
 		},
@@ -1016,23 +1016,23 @@ func TestClauseEval(t *testing.T) {
 			name:   "issue#1.2",
 			rule:   `{"+":[[{"var": "arg"}],2]}`,
 			expect: float64(10),
-			data: map[string]interface{}{
+			data: map[string]any{
 				"arg": float64(8),
 			},
 		},
 		{
 			name:   "issue#1.3",
 			rule:   `[{"var": "arg"}]`,
-			expect: []interface{}{float64(8)},
-			data: map[string]interface{}{
+			expect: []any{float64(8)},
+			data: map[string]any{
 				"arg": float64(8),
 			},
 		},
 		{
 			name:   "issue#1.4",
 			rule:   `[{"var": "arg"},{"var": "arg"}]`,
-			expect: []interface{}{float64(8), float64(8)},
-			data: map[string]interface{}{
+			expect: []any{float64(8), float64(8)},
+			data: map[string]any{
 				"arg": float64(8),
 			},
 		},
@@ -1077,7 +1077,7 @@ func BenchmarkFizzBuzz(b *testing.B) {
 
 								{ "var": "i" }
 							 ]}`
-	data := map[string]interface{}{"i": float64(20)}
+	data := map[string]any{"i": float64(20)}
 
 	var c Clause
 	err := json.Unmarshal([]byte(fizzbuzz), &c)
@@ -1132,7 +1132,6 @@ func TestClause_testsuite(t *testing.T) {
 	section := ""
 	sectionEntry := 0
 	for i, tline := range tests {
-		i := i
 		var newSection string
 		err = json.Unmarshal(tline, &newSection)
 		if err == nil {
@@ -1149,13 +1148,13 @@ func TestClause_testsuite(t *testing.T) {
 
 		t.Run(fmt.Sprintf("%d %s[%d]", i, section, sectionEntry), func(t *testing.T) {
 			t.Parallel()
-			var data interface{}
+			var data any
 			err = json.Unmarshal(details[1], &data)
 			if err != nil {
 				t.Skipf("could not unmarshal test data, %v", err)
 			}
 
-			var exp interface{}
+			var exp any
 			err = json.Unmarshal(details[2], &exp)
 			if err != nil {
 				t.Skipf("could not unmarshal test result, %v", err)
@@ -1204,10 +1203,9 @@ func BenchmarkClause_testsuite(b *testing.B) {
 	}
 
 	var cfs []ClauseFunc
-	var datas []interface{}
+	var datas []any
 
 	for i, tline := range tests {
-		i := i
 		var newSection string
 		err = json.Unmarshal(tline, &newSection)
 		if err == nil {
@@ -1220,7 +1218,7 @@ func BenchmarkClause_testsuite(b *testing.B) {
 			b.Skipf("couldm't unmarshal test case line %d", i)
 		}
 
-		var data interface{}
+		var data any
 		err = json.Unmarshal(details[1], &data)
 		if err != nil {
 			b.Skipf("could not unmarshal test data, %v", err)

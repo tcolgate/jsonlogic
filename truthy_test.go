@@ -9,7 +9,7 @@ import (
 func TestIsTrue(t *testing.T) {
 	type test struct {
 		name        string
-		in          interface{}
+		in          any
 		expect      bool
 		expectPanic bool
 	}
@@ -38,12 +38,12 @@ func TestIsTrue(t *testing.T) {
 
 		{
 			name:   "empty-array",
-			in:     []interface{}{},
+			in:     []any{},
 			expect: false,
 		},
 		{
 			name:   "non-empty-array",
-			in:     []interface{}{1, "hello"},
+			in:     []any{1, "hello"},
 			expect: true,
 		},
 		{
@@ -63,7 +63,7 @@ func TestIsTrue(t *testing.T) {
 		},
 		{
 			name:   "empty-dict",
-			in:     map[string]interface{}{},
+			in:     map[string]any{},
 			expect: true,
 		},
 		{

@@ -13,16 +13,16 @@ import (
 // as documented here: https://jsonlogic.com/truthy.html
 // in addition, an emptry struct is considered true, as
 // per jsonlogic JavaScript handling of "{}"
-func IsTrue(i interface{}) bool {
+func IsTrue(i any) bool {
 	if i == nil {
 		return false
 	}
 	switch v := i.(type) {
 	case float64:
 		return v != 0
-	case map[string]interface{}:
+	case map[string]any:
 		return true
-	case []interface{}:
+	case []any:
 		return len(v) != 0
 	case string:
 		return v != ""
@@ -33,7 +33,7 @@ func IsTrue(i interface{}) bool {
 	}
 }
 
-func toNumber(i interface{}) float64 {
+func toNumber(i any) float64 {
 	switch v := i.(type) {
 	case string:
 		tstr := strings.TrimSpace(v)
@@ -52,7 +52,7 @@ func toNumber(i interface{}) float64 {
 			return 1.0
 		}
 		return 0.0
-	case []interface{}:
+	case []any:
 		if len(v) == 0 {
 			return 0.0
 		}
@@ -67,7 +67,7 @@ func toNumber(i interface{}) float64 {
 	}
 }
 
-func toString(i interface{}) string {
+func toString(i any) string {
 	switch v := i.(type) {
 	case string:
 		return v
@@ -80,7 +80,7 @@ func toString(i interface{}) string {
 		return "false"
 	case nil:
 		return "null"
-	case []interface{}:
+	case []any:
 		var strs = make([]string, len(v))
 		for i := range v {
 			strs[i] = toString(v[i])
@@ -92,18 +92,18 @@ func toString(i interface{}) string {
 }
 
 // IsEqual is an exact equality check.
-func IsEqual(l, r interface{}) bool {
+func IsEqual(l, r any) bool {
 	_, lisfloat := l.(float64)
 	_, lisstr := l.(string)
 	_, lisbool := l.(bool)
-	lslice, lisslice := l.([]interface{})
-	lmap, lismap := l.(map[string]interface{})
+	lslice, lisslice := l.([]any)
+	lmap, lismap := l.(map[string]any)
 
 	_, risfloat := r.(float64)
 	_, risstr := r.(string)
 	_, risbool := r.(bool)
-	rslice, risslice := r.([]interface{})
-	rmap, rismap := r.(map[string]interface{})
+	rslice, risslice := r.([]any)
+	rmap, rismap := r.(map[string]any)
 
 	switch {
 	case l == nil && r == nil:
@@ -131,18 +131,18 @@ func IsEqual(l, r interface{}) bool {
 
 // IsSoftEqual is an equality check that will
 // coerce values according to JavaScript rules.
-func IsSoftEqual(l, r interface{}) bool {
+func IsSoftEqual(l, r any) bool {
 	_, lisfloat := l.(float64)
 	_, lisstr := l.(string)
 	_, lisbool := l.(bool)
-	lslice, lisslice := l.([]interface{})
-	lmap, lismap := l.(map[string]interface{})
+	lslice, lisslice := l.([]any)
+	lmap, lismap := l.(map[string]any)
 
 	_, risfloat := r.(float64)
 	_, risstr := r.(string)
 	_, risbool := r.(bool)
-	rslice, risslice := r.([]interface{})
-	rmap, rismap := r.(map[string]interface{})
+	rslice, risslice := r.([]any)
+	rmap, rismap := r.(map[string]any)
 
 	switch {
 	case l == nil && r == nil:
@@ -178,18 +178,18 @@ func IsSoftEqual(l, r interface{}) bool {
 // IsDeepEqual is an equality check that will
 // coerce values according to JavaScript rules, and
 // compare map and array content..
-func IsDeepEqual(l, r interface{}) bool {
+func IsDeepEqual(l, r any) bool {
 	_, lisfloat := l.(float64)
 	_, lisstr := l.(string)
 	_, lisbool := l.(bool)
-	lslice, lisslice := l.([]interface{})
-	lmap, lismap := l.(map[string]interface{})
+	lslice, lisslice := l.([]any)
+	lmap, lismap := l.(map[string]any)
 
 	_, risfloat := r.(float64)
 	_, risstr := r.(string)
 	_, risbool := r.(bool)
-	rslice, risslice := r.([]interface{})
-	rmap, rismap := r.(map[string]interface{})
+	rslice, risslice := r.([]any)
+	rmap, rismap := r.(map[string]any)
 
 	switch {
 	case l == nil && r == nil:
