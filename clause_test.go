@@ -26,7 +26,8 @@ func Example() {
 								{ "var": "i" }
 							 ]}`
 
-	data := map[string]any{"i": float64(20)}
+	type myData map[string]any
+	data := myData{"i": float64(20)}
 
 	var c Clause
 	err := json.Unmarshal([]byte(fizzbuzz), &c)
@@ -40,7 +41,11 @@ func Example() {
 	}
 
 	ctx := context.Background()
-	fmt.Println(cf(ctx, data))
+
+	// Using SafeCall ensures that attempts to call the function directly with a
+	// myData instance  will fail and forces us to cast back to a supported type.
+	fmt.Println(SafeCall(ctx, cf, (map[string]any)(data)))
+
 	// Output: buzz
 }
 

@@ -63,6 +63,11 @@ const (
 // prefer returning null to returning any specific errors.
 // The context argument is not used by any of the standard operations,
 // but may be used by custom operations to provide rich functionality.
+//
+// The data argument must be of a type that might be automatically created by
+// json.Unmarshal, specificall map[string]any, []any, string, float64 or bool.
+// The existing API cannot enforce this. Rather than calling the functions
+// directly, it is best to call ClauseFuncs via SafeCall
 type ClauseFunc func(ctx context.Context, data any) any
 
 func identityf(ctx context.Context, data any) any {

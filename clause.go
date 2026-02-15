@@ -1,6 +1,7 @@
 package jsonlogic
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 )
@@ -169,4 +170,17 @@ func (c Clause) MarshalJSON() ([]byte, error) {
 			c.Operator.Name: c.Arguments,
 		})
 	}
+}
+
+// SafeArgs is the set of types that it is safe to call ClauseFunc with
+type SafeArgs interface {
+	map[string]any | []any | string | float64 | bool
+}
+
+// SafeCall calls the given Clause with the given data. The original API suffers
+// from a usability trap. Simple types derived from base types can be passed, but
+// will silently fail. SafeCall requires the caller to cast the data back to
+// a support type.
+func SafeCall[AT SafeArgs](ctx context.Context, cf ClauseFunc, data AT) any {
+	return cf(ctx, data)
 }
